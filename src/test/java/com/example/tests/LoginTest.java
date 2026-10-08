@@ -418,4 +418,22 @@ public class LoginTest extends BaseTest {
         assertThat(elapsedSeconds).isLessThan(thresholdSeconds);
     }
 
+    @Test
+    @Order(21)
+    @DisplayName("TC20: SQL Injection trực tiếp vào trường Password")
+    public void TC20_SQLi_InPassword() {
+        loginPage.enterUsername(validUsername);
+        loginPage.enterPassword("' OR 'a'='a");
+        loginPage.clickLogin();
+
+        assertThat(homePage.isHomePageDisplayed()).isFalse();
+        try {
+            String error = loginPage.getErrorMessage();
+            assertThat(normalize(error).toLowerCase())
+                    .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
+        } catch (NoSuchElementException e) {
+            assertThat(loginPage.isLoginPageDisplayed() || driver.getCurrentUrl().contains("login")).isTrue();
+        }
+    }
+
 }

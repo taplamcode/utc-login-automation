@@ -126,4 +126,17 @@ public class LoginTest extends BaseTest {
         assertThat(normalize(error)).containsIgnoringCase(normalize(msgEmptyPassword));
     }
 
+    @Test
+    @Order(12)
+    @DisplayName("TC03: Đúng tên đăng nhập, sai mật khẩu")
+    public void TC03_ValidUsernameWrongPassword() {
+        loginPage.enterUsername(validUsername);
+        loginPage.enterPassword("utc@235");
+        loginPage.clickLogin();
+
+        String error = loginPage.getErrorMessage();
+        assertThat(normalize(error).toLowerCase())
+                .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
+    }
+
 }

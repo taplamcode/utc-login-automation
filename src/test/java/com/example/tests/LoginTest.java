@@ -342,4 +342,16 @@ public class LoginTest extends BaseTest {
         }
     }
 
+    @Test
+    @Order(16)
+    @DisplayName("TC15: Ký tự nháy đơn (') trong Username")
+    public void TC15_SingleQuoteInUsername() {
+        loginPage.enterUsername(validUsername + "'");
+        loginPage.enterPassword("123456");
+        loginPage.clickLogin();
+
+        String pageSource = driver.getPageSource().toLowerCase();
+        assertThat(pageSource).doesNotContain("500 internal server error", "sql syntax error", "unhandled exception");
+    }
+
 }

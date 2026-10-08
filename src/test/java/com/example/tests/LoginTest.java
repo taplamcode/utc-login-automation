@@ -114,4 +114,16 @@ public class LoginTest extends BaseTest {
         assertThat(normalize(error)).containsIgnoringCase(normalize(msgEmptyUsername));
     }
 
+    @Test
+    @Order(7)
+    @DisplayName("TC02: Để trống Password")
+    public void TC02_EmptyPassword() {
+        loginPage.enterUsername(validUsername);
+        loginPage.enterPassword("");
+        loginPage.clickLogin();
+
+        String error = loginPage.getErrorMessage();
+        assertThat(normalize(error)).containsIgnoringCase(normalize(msgEmptyPassword));
+    }
+
 }

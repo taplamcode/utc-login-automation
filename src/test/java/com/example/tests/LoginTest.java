@@ -217,4 +217,22 @@ public class LoginTest extends BaseTest {
                 .isTrue();
     }
 
+    @Test
+    @Order(8)
+    @DisplayName("TC07: Bỏ trống cả Tên đăng nhập và Mật khẩu")
+    public void TC07_EmptyBothFields() {
+        loginPage.enterUsername("");
+        loginPage.enterPassword("");
+        loginPage.clickLogin();
+
+        String error = loginPage.getErrorMessage();
+        assertThat(normalize(error).toLowerCase()).satisfies(msg ->
+                assertThat(msg).containsAnyOf(
+                        normalize(msgEmptyUsername).toLowerCase(),
+                        normalize(msgEmptyPassword).toLowerCase(),
+                        "chưa nhập"
+                )
+        );
+    }
+
 }

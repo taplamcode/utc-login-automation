@@ -189,4 +189,32 @@ public class LoginTest extends BaseTest {
                 .isTrue();
     }
 
+    @Test
+    @Order(3)
+    @DisplayName("TC06: Đăng nhập đúng + KHÔNG tích chọn 'Giữ tôi luôn đăng nhập', đóng/mở lại trình duyệt")
+    public void TC06_RememberMe_Unchecked() {
+        loginPage.enterUsername(validUsername);
+        loginPage.enterPassword(validPassword);
+        loginPage.setRememberMe(false);
+        loginPage.clickLogin();
+
+        boolean isLoginSuccess = homePage.isHomePageDisplayed();
+        if (!isLoginSuccess) {
+            diagnoseLoginFailure("TC06_RememberMe_Unchecked");
+        }
+        assertThat(isLoginSuccess)
+                .as("Đăng nhập thất bại! Tài khoản [" + validUsername + "] có thể đã bị đổi mật khẩu hoặc bị khóa. Vui lòng cập nhật mật khẩu mới trong config.properties.")
+                .isTrue();
+
+        driver.quit();
+
+        driver = DriverFactory.createDriver();
+        driver.get(baseUrl);
+
+        LoginPage newLoginPage = new LoginPage(driver);
+        assertThat(newLoginPage.isLoginPageDisplayed())
+                .as("Mở lại trình duyệt khi KHÔNG tích 'Giữ tôi luôn đăng nhập' phải quay lại trang đăng nhập")
+                .isTrue();
+    }
+
 }

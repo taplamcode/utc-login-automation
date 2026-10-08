@@ -324,4 +324,22 @@ public class LoginTest extends BaseTest {
                 .isTrue();
     }
 
+    @Test
+    @Order(15)
+    @DisplayName("TC14: SQL Injection cơ bản (' or 1=1 --)")
+    public void TC14_SQLi_BasicBypass() {
+        loginPage.enterUsername("' or 1=1 --");
+        loginPage.enterPassword("anyPassword");
+        loginPage.clickLogin();
+
+        assertThat(homePage.isHomePageDisplayed()).isFalse();
+        try {
+            String error = loginPage.getErrorMessage();
+            assertThat(normalize(error).toLowerCase())
+                    .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
+        } catch (NoSuchElementException e) {
+            assertThat(loginPage.isLoginPageDisplayed() || driver.getCurrentUrl().contains("login")).isTrue();
+        }
+    }
+
 }

@@ -85,6 +85,10 @@ public class LoginTest extends BaseTest {
         System.err.println("================================================================================\n");
     }
 
+    // =========================================================================
+    // NHÓM 1: KIỂM TRA TRẠNG THÁI TÀI KHOẢN & ĐĂNG NHẬP HỢP LỆ (CHẠY TRƯỚC ĐỂ TRÁNH BỊ KHÓA TÀI KHOẢN)
+    // =========================================================================
+
     @Test
     @Order(1)
     @DisplayName("TC00_PreCheck: Kiểm tra trạng thái tài khoản kiểm thử")
@@ -100,56 +104,6 @@ public class LoginTest extends BaseTest {
                     .as("Đăng nhập thất bại! Tài khoản [" + validUsername + "] có thể đã bị đổi mật khẩu hoặc bị khóa. Vui lòng cập nhật mật khẩu mới trong config.properties.")
                     .isTrue();
         }
-    }
-
-    @Test
-    @Order(6)
-    @DisplayName("TC01: Để trống Username")
-    public void TC01_EmptyUsername() {
-        loginPage.enterUsername("");
-        loginPage.enterPassword("1256");
-        loginPage.clickLogin();
-
-        String error = loginPage.getErrorMessage();
-        assertThat(normalize(error)).containsIgnoringCase(normalize(msgEmptyUsername));
-    }
-
-    @Test
-    @Order(7)
-    @DisplayName("TC02: Để trống Password")
-    public void TC02_EmptyPassword() {
-        loginPage.enterUsername(validUsername);
-        loginPage.enterPassword("");
-        loginPage.clickLogin();
-
-        String error = loginPage.getErrorMessage();
-        assertThat(normalize(error)).containsIgnoringCase(normalize(msgEmptyPassword));
-    }
-
-    @Test
-    @Order(12)
-    @DisplayName("TC03: Đúng tên đăng nhập, sai mật khẩu")
-    public void TC03_ValidUsernameWrongPassword() {
-        loginPage.enterUsername(validUsername);
-        loginPage.enterPassword("utc@235");
-        loginPage.clickLogin();
-
-        String error = loginPage.getErrorMessage();
-        assertThat(normalize(error).toLowerCase())
-                .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
-    }
-
-    @Test
-    @Order(13)
-    @DisplayName("TC04: Sai tên đăng nhập, đúng mật khẩu")
-    public void TC04_WrongUsernameValidPassword() {
-        loginPage.enterUsername("huongthunguyen");
-        loginPage.enterPassword(validPassword);
-        loginPage.clickLogin();
-
-        String error = loginPage.getErrorMessage();
-        assertThat(normalize(error).toLowerCase())
-                .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
     }
 
     @Test
@@ -218,6 +172,59 @@ public class LoginTest extends BaseTest {
     }
 
     @Test
+    @Order(4)
+    @DisplayName("TC13: Đăng nhập bằng phím Enter")
+    public void TC13_SubmitWithEnterKey() {
+        loginPage.enterUsername(validUsername);
+        loginPage.enterPassword(validPassword);
+        loginPage.submitWithEnterKey();
+
+        boolean isLoginSuccess = homePage.isHomePageDisplayed();
+        if (!isLoginSuccess) {
+            diagnoseLoginFailure("TC13_SubmitWithEnterKey");
+        }
+        assertThat(isLoginSuccess)
+                .as("Đăng nhập thất bại! Tài khoản [" + validUsername + "] có thể đã bị đổi mật khẩu hoặc bị khóa. Vui lòng cập nhật mật khẩu mới trong config.properties.")
+                .isTrue();
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("TC12: Mật khẩu được che (Masked text)")
+    public void TC12_PasswordMasked() {
+        String fieldType = loginPage.getPasswordFieldType();
+        assertThat(fieldType).isEqualTo("password");
+    }
+
+    // =========================================================================
+    // NHÓM 2: KIỂM THỬ GIÁ TRỊ RỖNG & BIÊN TRƯỜNG DỮ LIỆU
+    // =========================================================================
+
+    @Test
+    @Order(6)
+    @DisplayName("TC01: Để trống Username")
+    public void TC01_EmptyUsername() {
+        loginPage.enterUsername("");
+        loginPage.enterPassword("1256");
+        loginPage.clickLogin();
+
+        String error = loginPage.getErrorMessage();
+        assertThat(normalize(error)).containsIgnoringCase(normalize(msgEmptyUsername));
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("TC02: Để trống Password")
+    public void TC02_EmptyPassword() {
+        loginPage.enterUsername(validUsername);
+        loginPage.enterPassword("");
+        loginPage.clickLogin();
+
+        String error = loginPage.getErrorMessage();
+        assertThat(normalize(error)).containsIgnoringCase(normalize(msgEmptyPassword));
+    }
+
+    @Test
     @Order(8)
     @DisplayName("TC07: Bỏ trống cả Tên đăng nhập và Mật khẩu")
     public void TC07_EmptyBothFields() {
@@ -274,19 +281,6 @@ public class LoginTest extends BaseTest {
     }
 
     @Test
-    @Order(14)
-    @DisplayName("TC10: Cả Tên đăng nhập và Mật khẩu đều sai")
-    public void TC10_BothCredentialsInvalid() {
-        loginPage.enterUsername("sai_user");
-        loginPage.enterPassword("sai_pass");
-        loginPage.clickLogin();
-
-        String error = loginPage.getErrorMessage();
-        assertThat(normalize(error).toLowerCase())
-                .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
-    }
-
-    @Test
     @Order(11)
     @DisplayName("TC11: Phân biệt hoa/thường ở Username")
     public void TC11_CaseSensitivityUsername() {
@@ -299,30 +293,52 @@ public class LoginTest extends BaseTest {
         assertThat(isLogged || staysAtLogin).isTrue();
     }
 
-    @Test
-    @Order(5)
-    @DisplayName("TC12: Mật khẩu được che (Masked text)")
-    public void TC12_PasswordMasked() {
-        String fieldType = loginPage.getPasswordFieldType();
-        assertThat(fieldType).isEqualTo("password");
-    }
+    // =========================================================================
+    // NHÓM 3: KIỂM THỬ THÔNG TIN ĐĂNG NHẬP SAI (CHẠY SAU ĐỂ TRÁNH BỊ LOCK TÀI KHOẢN)
+    // =========================================================================
 
     @Test
-    @Order(4)
-    @DisplayName("TC13: Đăng nhập bằng phím Enter")
-    public void TC13_SubmitWithEnterKey() {
+    @Order(12)
+    @DisplayName("TC03: Đúng tên đăng nhập, sai mật khẩu")
+    public void TC03_ValidUsernameWrongPassword() {
         loginPage.enterUsername(validUsername);
-        loginPage.enterPassword(validPassword);
-        loginPage.submitWithEnterKey();
+        loginPage.enterPassword("utc@235");
+        loginPage.clickLogin();
 
-        boolean isLoginSuccess = homePage.isHomePageDisplayed();
-        if (!isLoginSuccess) {
-            diagnoseLoginFailure("TC13_SubmitWithEnterKey");
-        }
-        assertThat(isLoginSuccess)
-                .as("Đăng nhập thất bại! Tài khoản [" + validUsername + "] có thể đã bị đổi mật khẩu hoặc bị khóa. Vui lòng cập nhật mật khẩu mới trong config.properties.")
-                .isTrue();
+        String error = loginPage.getErrorMessage();
+        assertThat(normalize(error).toLowerCase())
+                .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
     }
+
+    @Test
+    @Order(13)
+    @DisplayName("TC04: Sai tên đăng nhập, đúng mật khẩu")
+    public void TC04_WrongUsernameValidPassword() {
+        loginPage.enterUsername("huongthunguyen");
+        loginPage.enterPassword(validPassword);
+        loginPage.clickLogin();
+
+        String error = loginPage.getErrorMessage();
+        assertThat(normalize(error).toLowerCase())
+                .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
+    }
+
+    @Test
+    @Order(14)
+    @DisplayName("TC10: Cả Tên đăng nhập và Mật khẩu đều sai")
+    public void TC10_BothCredentialsInvalid() {
+        loginPage.enterUsername("sai_user");
+        loginPage.enterPassword("sai_pass");
+        loginPage.clickLogin();
+
+        String error = loginPage.getErrorMessage();
+        assertThat(normalize(error).toLowerCase())
+                .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
+    }
+
+    // =========================================================================
+    // NHÓM 4: BẢO MẬT & SQL INJECTION (CHẠY CUỐI CÙNG)
+    // =========================================================================
 
     @Test
     @Order(15)
@@ -435,5 +451,4 @@ public class LoginTest extends BaseTest {
             assertThat(loginPage.isLoginPageDisplayed() || driver.getCurrentUrl().contains("login")).isTrue();
         }
     }
-
 }

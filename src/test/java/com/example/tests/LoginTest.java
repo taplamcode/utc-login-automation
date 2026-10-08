@@ -354,4 +354,22 @@ public class LoginTest extends BaseTest {
         assertThat(pageSource).doesNotContain("500 internal server error", "sql syntax error", "unhandled exception");
     }
 
+    @Test
+    @Order(17)
+    @DisplayName("TC16: Biểu thức logic luôn đúng ở cả 2 trường (' OR '1'='1)")
+    public void TC16_SQLi_BothFieldsLogic() {
+        loginPage.enterUsername("' OR '1'='1");
+        loginPage.enterPassword("' OR '1'='1");
+        loginPage.clickLogin();
+
+        assertThat(homePage.isHomePageDisplayed()).isFalse();
+        try {
+            String error = loginPage.getErrorMessage();
+            assertThat(normalize(error).toLowerCase())
+                    .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
+        } catch (NoSuchElementException e) {
+            assertThat(loginPage.isLoginPageDisplayed() || driver.getCurrentUrl().contains("login")).isTrue();
+        }
+    }
+
 }

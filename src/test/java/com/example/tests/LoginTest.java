@@ -390,4 +390,16 @@ public class LoginTest extends BaseTest {
         }
     }
 
+    @Test
+    @Order(19)
+    @DisplayName("TC18: UNION SELECT SQL Injection")
+    public void TC18_SQLi_UnionSelect() {
+        loginPage.enterUsername("' UNION SELECT NULL--");
+        loginPage.enterPassword("test");
+        loginPage.clickLogin();
+
+        String pageSource = driver.getPageSource().toLowerCase();
+        assertThat(pageSource).doesNotContain("table not found", "schema", "stack trace", "java.sql.sqlexception");
+    }
+
 }

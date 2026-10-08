@@ -402,4 +402,20 @@ public class LoginTest extends BaseTest {
         assertThat(pageSource).doesNotContain("table not found", "schema", "stack trace", "java.sql.sqlexception");
     }
 
+    @Test
+    @Order(20)
+    @DisplayName("TC19: Time-based Blind SQL Injection (WAITFOR DELAY)")
+    public void TC19_SQLi_TimeBasedDelay() {
+        double thresholdSeconds = ConfigReader.getDoubleProperty("sqlTimeoutThresholdSeconds", 4.0);
+
+        long startNano = System.nanoTime();
+        loginPage.enterUsername(validUsername + "'; WAITFOR DELAY '0:0:5'--");
+        loginPage.enterPassword(validPassword);
+        loginPage.clickLogin();
+        long elapsedNano = System.nanoTime() - startNano;
+
+        double elapsedSeconds = elapsedNano / 1_000_000_000.0;
+        assertThat(elapsedSeconds).isLessThan(thresholdSeconds);
+    }
+
 }

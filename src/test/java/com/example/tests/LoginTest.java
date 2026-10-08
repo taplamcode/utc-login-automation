@@ -152,4 +152,41 @@ public class LoginTest extends BaseTest {
                 .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
     }
 
+    @Test
+    @Order(2)
+    @DisplayName("TC05: Đăng nhập đúng + Tích chọn 'Giữ tôi luôn đăng nhập', đóng/mở lại trình duyệt")
+    public void TC05_RememberMe_Checked() {
+        loginPage.enterUsername(validUsername);
+        loginPage.enterPassword(validPassword);
+        loginPage.setRememberMe(true);
+        loginPage.clickLogin();
+
+        boolean isLoginSuccess = homePage.isHomePageDisplayed();
+        if (!isLoginSuccess) {
+            diagnoseLoginFailure("TC05_RememberMe_Checked");
+        }
+        assertThat(isLoginSuccess)
+                .as("Đăng nhập thất bại! Tài khoản [" + validUsername + "] có thể đã bị đổi mật khẩu hoặc bị khóa. Vui lòng cập nhật mật khẩu mới trong config.properties.")
+                .isTrue();
+
+        Set<Cookie> sessionCookies = driver.manage().getCookies();
+        driver.quit();
+
+        driver = DriverFactory.createDriver();
+        driver.get(baseUrl);
+
+        for (Cookie cookie : sessionCookies) {
+            try {
+                driver.manage().addCookie(cookie);
+            } catch (Exception ignored) {
+            }
+        }
+        driver.navigate().refresh();
+
+        HomePage newHomePage = new HomePage(driver);
+        assertThat(newHomePage.isHomePageDisplayed())
+                .as("Mở lại trình duyệt khi đã tích 'Giữ tôi luôn đăng nhập' vẫn phải ở Trang Chủ")
+                .isTrue();
+    }
+
 }

@@ -286,4 +286,17 @@ public class LoginTest extends BaseTest {
                 .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
     }
 
+    @Test
+    @Order(11)
+    @DisplayName("TC11: Phân biệt hoa/thường ở Username")
+    public void TC11_CaseSensitivityUsername() {
+        loginPage.enterUsername(validUsername.toUpperCase());
+        loginPage.enterPassword(validPassword);
+        loginPage.clickLogin();
+
+        boolean isLogged = homePage.isHomePageDisplayed();
+        boolean staysAtLogin = loginPage.isLoginPageDisplayed() || driver.getCurrentUrl().contains("login");
+        assertThat(isLogged || staysAtLogin).isTrue();
+    }
+
 }

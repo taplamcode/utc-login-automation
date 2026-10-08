@@ -299,4 +299,12 @@ public class LoginTest extends BaseTest {
         assertThat(isLogged || staysAtLogin).isTrue();
     }
 
+    @Test
+    @Order(5)
+    @DisplayName("TC12: Mật khẩu được che (Masked text)")
+    public void TC12_PasswordMasked() {
+        String fieldType = loginPage.getPasswordFieldType();
+        assertThat(fieldType).isEqualTo("password");
+    }
+
 }

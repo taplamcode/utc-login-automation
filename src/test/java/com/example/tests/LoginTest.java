@@ -85,4 +85,21 @@ public class LoginTest extends BaseTest {
         System.err.println("================================================================================\n");
     }
 
+    @Test
+    @Order(1)
+    @DisplayName("TC00_PreCheck: Kiểm tra trạng thái tài khoản kiểm thử")
+    public void TC00_PreCheck_ValidAccount() {
+        loginPage.enterUsername(validUsername);
+        loginPage.enterPassword(validPassword);
+        loginPage.clickLogin();
+
+        boolean isSuccess = homePage.isHomePageDisplayed();
+        if (!isSuccess) {
+            diagnoseLoginFailure("TC00_PreCheck");
+            assertThat(isSuccess)
+                    .as("Đăng nhập thất bại! Tài khoản [" + validUsername + "] có thể đã bị đổi mật khẩu hoặc bị khóa. Vui lòng cập nhật mật khẩu mới trong config.properties.")
+                    .isTrue();
+        }
+    }
+
 }

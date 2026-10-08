@@ -372,4 +372,22 @@ public class LoginTest extends BaseTest {
         }
     }
 
+    @Test
+    @Order(18)
+    @DisplayName("TC17: Chú thích SQL ngắt kiểm tra mật khẩu (huongnt'--)")
+    public void TC17_SQLi_CommentTruncation() {
+        loginPage.enterUsername(validUsername + "'--");
+        loginPage.enterPassword("anyPassword");
+        loginPage.clickLogin();
+
+        assertThat(homePage.isHomePageDisplayed()).isFalse();
+        try {
+            String error = loginPage.getErrorMessage();
+            assertThat(normalize(error).toLowerCase())
+                    .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
+        } catch (NoSuchElementException e) {
+            assertThat(loginPage.isLoginPageDisplayed() || driver.getCurrentUrl().contains("login")).isTrue();
+        }
+    }
+
 }

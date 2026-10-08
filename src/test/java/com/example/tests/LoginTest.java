@@ -102,4 +102,16 @@ public class LoginTest extends BaseTest {
         }
     }
 
+    @Test
+    @Order(6)
+    @DisplayName("TC01: Để trống Username")
+    public void TC01_EmptyUsername() {
+        loginPage.enterUsername("");
+        loginPage.enterPassword("1256");
+        loginPage.clickLogin();
+
+        String error = loginPage.getErrorMessage();
+        assertThat(normalize(error)).containsIgnoringCase(normalize(msgEmptyUsername));
+    }
+
 }

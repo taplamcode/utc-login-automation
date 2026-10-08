@@ -254,4 +254,23 @@ public class LoginTest extends BaseTest {
         );
     }
 
+    @Test
+    @Order(10)
+    @DisplayName("TC09: Password toàn khoảng trắng")
+    public void TC09_PasswordSpaces() {
+        loginPage.enterUsername(validUsername);
+        loginPage.enterPassword("   ");
+        loginPage.clickLogin();
+
+        String error = loginPage.getErrorMessage();
+        assertThat(normalize(error).toLowerCase()).satisfies(msg ->
+                assertThat(msg).containsAnyOf(
+                        normalize(msgEmptyPassword).toLowerCase(),
+                        normalize(msgInvalidAccount).toLowerCase(),
+                        "chưa nhập",
+                        "không đúng"
+                )
+        );
+    }
+
 }

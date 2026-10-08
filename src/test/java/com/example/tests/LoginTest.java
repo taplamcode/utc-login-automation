@@ -307,4 +307,21 @@ public class LoginTest extends BaseTest {
         assertThat(fieldType).isEqualTo("password");
     }
 
+    @Test
+    @Order(4)
+    @DisplayName("TC13: Đăng nhập bằng phím Enter")
+    public void TC13_SubmitWithEnterKey() {
+        loginPage.enterUsername(validUsername);
+        loginPage.enterPassword(validPassword);
+        loginPage.submitWithEnterKey();
+
+        boolean isLoginSuccess = homePage.isHomePageDisplayed();
+        if (!isLoginSuccess) {
+            diagnoseLoginFailure("TC13_SubmitWithEnterKey");
+        }
+        assertThat(isLoginSuccess)
+                .as("Đăng nhập thất bại! Tài khoản [" + validUsername + "] có thể đã bị đổi mật khẩu hoặc bị khóa. Vui lòng cập nhật mật khẩu mới trong config.properties.")
+                .isTrue();
+    }
+
 }

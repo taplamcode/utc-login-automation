@@ -273,4 +273,17 @@ public class LoginTest extends BaseTest {
         );
     }
 
+    @Test
+    @Order(14)
+    @DisplayName("TC10: Cả Tên đăng nhập và Mật khẩu đều sai")
+    public void TC10_BothCredentialsInvalid() {
+        loginPage.enterUsername("sai_user");
+        loginPage.enterPassword("sai_pass");
+        loginPage.clickLogin();
+
+        String error = loginPage.getErrorMessage();
+        assertThat(normalize(error).toLowerCase())
+                .satisfies(msg -> assertThat(msg).containsAnyOf(normalize(msgInvalidAccount).toLowerCase(), "không đúng"));
+    }
+
 }
